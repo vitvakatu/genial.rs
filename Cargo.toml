@@ -1,0 +1,7 @@
+[package]
+name = "genial"
+version = "0.1.0"
+authors = ["Ilya Bogdanov <fumlead@gmail.com>"]
+
+[dependencies]
+imagefmt = "4.0"
