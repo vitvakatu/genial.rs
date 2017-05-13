@@ -24,6 +24,7 @@ pub mod color {
     pub const NAVY: RGB = RGB(0, 0, 128);
 }
 
+#[derive(Clone)]
 pub struct Image {
     data: Vec<RGB>,
     width: i32,
@@ -61,7 +62,7 @@ impl Image {
         self.data[index as usize] = color;
     }
 
-    pub fn get_pixel(&mut self, x: i32, y: i32) -> RGB {
+    pub fn get_pixel(&self, x: i32, y: i32) -> RGB {
         debug_assert!(x <= self.width);
         debug_assert!(y <= self.height);
         let index = (self.height - y - 1) * self.width + x;
@@ -83,6 +84,33 @@ impl Image {
                         &buf,
                         ColType::Color)
                 .unwrap();
+    }
+}
+
+pub mod ops {
+    use ::*;
+    pub fn flip_vertical(image: &Image) -> Image {
+        let (width, height) = image.dimensions();
+        let mut result = Image::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                let p = image.get_pixel(x, y);
+                result.set_pixel(x, height - y - 1, p);
+            }
+        }
+        result
+    }
+
+    pub fn flip_horizontal(image: &Image) -> Image {
+        let (width, height) = image.dimensions();
+        let mut result = Image::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                let p = image.get_pixel(x, y);
+                result.set_pixel(width - x - 1, y, p);
+            }
+        }
+        result
     }
 }
 
