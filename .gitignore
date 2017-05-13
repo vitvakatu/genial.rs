@@ -1,3 +1,10 @@
 target/
 **/*.rs.bk
 Cargo.lock
+
+*.bk
+
+*.bmp
+*.jpg
+*.png
+*.tga
