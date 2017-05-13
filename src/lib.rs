@@ -51,6 +51,29 @@ impl Image {
         }
     }
 
+    pub fn from_file(filename: &str) -> Option<Self> {
+        let image = imagefmt::read(filename, ColFmt::Auto);
+        match image {
+            Ok(image) => {
+                let (width, height) = (image.w, image.h);
+                if image.fmt != ColFmt::RGB {
+                    return None;
+                }
+                let mut buf = Vec::with_capacity(width * height);
+                for c in image.buf.chunks(3) {
+                    let color = RGB(c[0], c[1], c[2]);
+                    buf.push(color);
+                }
+                Some(Image {
+                         width: width as i32,
+                         height: height as i32,
+                         data: buf,
+                     })
+            }
+            Err(_) => None,
+        }
+    }
+
     pub fn dimensions(&self) -> (i32, i32) {
         (self.width, self.height)
     }
