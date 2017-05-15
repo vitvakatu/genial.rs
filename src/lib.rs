@@ -134,8 +134,10 @@ impl Image {
     }
 
     pub fn set_pixel<P: Pixel>(&mut self, x: i32, y: i32, color: P) {
-        debug_assert!(x <= self.width as i32);
-        debug_assert!(y <= self.height as i32);
+        let (width, height) = self.dimensions();
+        if x > width as i32 || y > height as i32 || x < 0 || y < 0 {
+            return;
+        }
         let index = ((self.height as i32 - y - 1) * self.width as i32 + x) as usize *
                     self.format.channels();
         let channels = self.format.channels() as usize;
@@ -147,9 +149,11 @@ impl Image {
     }
 
     pub fn get_pixel<P: Pixel>(&self, x: i32, y: i32) -> P {
-        debug_assert!(x <= self.width as i32);
-        debug_assert!(y <= self.height as i32);
-        let index = ((self.height as i32 - y - 1) * self.width as i32 + x) as usize *
+        let (width, height) = self.dimensions();
+        if x > width as i32 || y > height as i32 || x < 0 || y < 0 {
+            return P::from_rgb(0, 0, 0);
+        }
+        let index = ((height as i32 - y - 1) * width as i32 + x) as usize *
                     self.format.channels() as usize;
         match self.format {
             ColorFormat::RGB => {
