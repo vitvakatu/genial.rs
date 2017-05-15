@@ -173,28 +173,42 @@ impl Image {
 
 pub mod ops {
     use ::*;
-    pub fn flip_vertical(image: &Image) -> Image {
-        let (width, height) = image.dimensions();
-        let mut result = Image::new(width, height, image.format);
-        for y in 0..height {
-            for x in 0..width {
-                let p: RGB = image.get_pixel(x as i32, y as i32);
-                result.set_pixel(x as i32, (height - y) as i32 - 1, p);
-            }
-        }
-        result
+
+    pub trait ImageOps {
+        fn flip_vertical(&mut self) -> &mut Image;
+        fn flip_horizontal(&mut self) -> &mut Image;
     }
 
-    pub fn flip_horizontal(image: &Image) -> Image {
-        let (width, height) = image.dimensions();
-        let mut result = Image::new(width, height, image.format);
-        for y in 0..height {
-            for x in 0..width {
-                let p: RGB = image.get_pixel(x as i32, y as i32);
-                result.set_pixel((width - x) as i32 - 1, y as i32, p);
+    impl ImageOps for Image {
+        fn flip_vertical(&mut self) -> &mut Image {
+            let (width, height) = self.dimensions();
+            let mut pixel1: RGB;
+            let mut pixel2: RGB;
+            for y in 0..height / 2 {
+                for x in 0..width {
+                    pixel1 = self.get_pixel(x as i32, y as i32);
+                    pixel2 = self.get_pixel(x as i32, (height - y - 1) as i32);
+                    self.set_pixel(x as i32, y as i32, pixel2);
+                    self.set_pixel(x as i32, (height - y - 1) as i32, pixel1);
+                }
             }
+            self
         }
-        result
+
+        fn flip_horizontal(&mut self) -> &mut Image {
+            let (width, height) = self.dimensions();
+            let mut pixel1: RGB;
+            let mut pixel2: RGB;
+            for x in 0..width / 2 {
+                for y in 0..height {
+                    pixel1 = self.get_pixel(x as i32, y as i32);
+                    pixel2 = self.get_pixel((width - x - 1) as i32, y as i32);
+                    self.set_pixel(x as i32, y as i32, pixel2);
+                    self.set_pixel((width - x - 1) as i32, y as i32, pixel1);
+                }
+            }
+            self
+        }
     }
 }
 
