@@ -218,15 +218,55 @@ pub mod ops {
 
 pub mod draw {
     use ::*;
-    pub fn draw_line(image: &mut Image,
-                     (mut x0, mut y0): (i32, i32),
-                     (mut x1, mut y1): (i32, i32),
-                     color: RGB) {
-        let dimensions = image.dimensions();
-        debug_assert!(x0 <= dimensions.0 as i32);
-        debug_assert!(x1 <= dimensions.0 as i32);
-        debug_assert!(y0 <= dimensions.1 as i32);
-        debug_assert!(y1 <= dimensions.1 as i32);
+
+    pub struct LineBuilder<'a> {
+        image: &'a mut Image,
+        from: (i32, i32),
+        to: (i32, i32),
+        color: RGB,
+    }
+
+    impl<'a> LineBuilder<'a> {
+        pub fn from(mut self, x: i32, y: i32) -> Self {
+            self.from = (x, y);
+            self
+        }
+
+        pub fn to(mut self, x: i32, y: i32) -> Self {
+            self.to = (x, y);
+            self
+        }
+
+        pub fn with_color(mut self, color: RGB) -> Self {
+            self.color = color;
+            self
+        }
+
+        pub fn draw(self) -> &'a mut Image {
+            draw_line(self.image, self.from, self.to, self.color);
+            self.image
+        }
+    }
+
+    pub trait Draw {
+        fn line(&mut self) -> LineBuilder;
+    }
+
+    impl Draw for Image {
+        fn line(&mut self) -> LineBuilder {
+            LineBuilder {
+                image: self,
+                from: (0, 0),
+                to: (0, 0),
+                color: rgb(0, 0, 0),
+            }
+        }
+    }
+
+    fn draw_line(image: &mut Image,
+                 (mut x0, mut y0): (i32, i32),
+                 (mut x1, mut y1): (i32, i32),
+                 color: RGB) {
         let mut steep = false;
         if (x0 - x1).abs() < (y0 - y1).abs() {
             steep = true;
