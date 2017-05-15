@@ -11,5 +11,10 @@ fn main() {
         .to(100, 100)
         .with_color(color::WHITE)
         .draw()
+        .circle()
+        .origin(50, 50)
+        .radius(30)
+        .with_color(color::CYAN)
+        .draw()
         .save_to_file("drawing.bmp");
 }

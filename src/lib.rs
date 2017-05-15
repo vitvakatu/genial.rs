@@ -248,8 +248,48 @@ pub mod draw {
         }
     }
 
+    pub struct CircleBuilder<'a> {
+        image: &'a mut Image,
+        filled: bool,
+        origin: (i32, i32),
+        radius: i32,
+        color: RGB,
+    }
+
+    impl<'a> CircleBuilder<'a> {
+        pub fn origin(mut self, x: i32, y: i32) -> Self {
+            self.origin = (x, y);
+            self
+        }
+
+        pub fn filled(mut self) -> Self {
+            self.filled = true;
+            self
+        }
+
+        pub fn radius(mut self, radius: i32) -> Self {
+            self.radius = radius;
+            self
+        }
+
+        pub fn with_color(mut self, color: RGB) -> Self {
+            self.color = color;
+            self
+        }
+
+        pub fn draw(self) -> &'a mut Image {
+            if self.filled {
+                draw_filled_circle(self.image, self.origin, self.radius, self.color);
+            } else {
+                draw_circle(self.image, self.origin, self.radius, self.color);
+            }
+            self.image
+        }
+    }
+
     pub trait Draw {
         fn line(&mut self) -> LineBuilder;
+        fn circle(&mut self) -> CircleBuilder;
     }
 
     impl Draw for Image {
@@ -258,6 +298,16 @@ pub mod draw {
                 image: self,
                 from: (0, 0),
                 to: (0, 0),
+                color: rgb(0, 0, 0),
+            }
+        }
+
+        fn circle(&mut self) -> CircleBuilder {
+            CircleBuilder {
+                image: self,
+                filled: false,
+                origin: (0,0),
+                radius: 0,
                 color: rgb(0, 0, 0),
             }
         }
@@ -300,7 +350,7 @@ pub mod draw {
         }
     }
 
-    pub fn draw_circle(image: &mut Image, (x0, y0): (i32, i32), r: i32, color: RGB) {
+    fn draw_circle(image: &mut Image, (x0, y0): (i32, i32), r: i32, color: RGB) {
         let mut x: i32 = r;
         let mut y: i32 = 0;
         let mut err = 0;
@@ -325,7 +375,7 @@ pub mod draw {
         }
     }
 
-    pub fn draw_filled_circle(image: &mut Image, (x0, y0): (i32, i32), r: i32, color: RGB) {
+    fn draw_filled_circle(image: &mut Image, (x0, y0): (i32, i32), r: i32, color: RGB) {
         let r2 = r * r;
         let area = r2 << 2;
         let rr = r << 1;
