@@ -79,12 +79,6 @@ pub struct Image {
     format: ColorFormat,
 }
 
-fn swap<T: Clone>(i: &mut T, j: &mut T) {
-    let tmp = i.clone();
-    *i = j.clone();
-    *j = tmp;
-}
-
 impl Image {
     pub fn new(width: usize, height: usize, format: ColorFormat) -> Self {
         let mut data = Vec::with_capacity(width as usize * height as usize *
@@ -314,18 +308,36 @@ pub mod draw {
     }
 
     fn draw_line(image: &mut Image,
-                 (mut x0, mut y0): (i32, i32),
-                 (mut x1, mut y1): (i32, i32),
+                 (x_start, y_start): (i32, i32),
+                 (x_end, y_end): (i32, i32),
                  color: RGB) {
         let mut steep = false;
-        if (x0 - x1).abs() < (y0 - y1).abs() {
+        let mut x0: i32;
+        let mut x1: i32;
+        let mut y0: i32;
+        let mut y1: i32;
+        if (x_start - x_end).abs() < (y_start - y_end).abs() {
             steep = true;
-            swap(&mut x0, &mut y0);
-            swap(&mut x1, &mut y1);
+            // swap x and y
+            x0 = y_start;
+            x1 = y_end;
+            y0 = x_start;
+            y1 = x_end;
+        } else {
+            // normal
+            x0 = x_start;
+            x1 = x_end;
+            y0 = y_start;
+            y1 = y_end;
         }
-        if x0 > x1 {
-            swap(&mut x0, &mut x1);
-            swap(&mut y0, &mut y1);
+        if x_start > x_end {
+            // swap the beginning and the end of the line
+            let mut tmp = x1;
+            x1 = x0;
+            x0 = tmp;
+            tmp = y1;
+            y1 = y0;
+            y0 = tmp;
         }
         let dx = x1 - x0;
         let dy = y1 - y0;
