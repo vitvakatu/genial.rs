@@ -262,8 +262,8 @@ pub mod draw {
             self
         }
 
-        pub fn filled(mut self) -> Self {
-            self.filled = true;
+        pub fn filled(mut self, filled: bool) -> Self {
+            self.filled = filled;
             self
         }
 
