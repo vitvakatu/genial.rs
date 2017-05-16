@@ -55,7 +55,7 @@ impl ColorFormat {
 
 pub trait Pixel {
     fn from_rgb(u8, u8, u8) -> Self;
-    fn color_fmt(&self) -> ColorFormat;
+    fn format(&self) -> ColorFormat;
     fn as_slice(&self) -> &[u8];
 }
 
@@ -63,7 +63,7 @@ impl Pixel for RGB {
     fn from_rgb(r: u8, g: u8, b: u8) -> Self {
         rgb(r, g, b)
     }
-    fn color_fmt(&self) -> ColorFormat {
+    fn format(&self) -> ColorFormat {
         ColorFormat::RGB
     }
     fn as_slice(&self) -> &[u8] {
@@ -141,7 +141,7 @@ impl Image {
         let index = ((self.height as i32 - y - 1) * self.width as i32 + x) as usize *
                     self.format.channels();
         let channels = self.format.channels() as usize;
-        if color.color_fmt() == self.format {
+        if color.format() == self.format {
             for i in index..(index + channels) {
                 self.data[i] = color.as_slice()[i - index];
             }
@@ -306,7 +306,7 @@ pub mod draw {
             CircleBuilder {
                 image: self,
                 filled: false,
-                origin: (0,0),
+                origin: (0, 0),
                 radius: 0,
                 color: rgb(0, 0, 0),
             }
